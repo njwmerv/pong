@@ -1,6 +1,6 @@
-import os
 import pygame
-from random import randint, uniform
+from sys import exit
+from random import randint
 
 # Screen Constants
 FPS = 60
@@ -37,6 +37,12 @@ def resetBall(aBall, aBallVelocity):
   aBallVelocity['x'] = 5 if randint(0, 1) == 1 else -5
   aBallVelocity['y'] = 5 if randint(0, 1) == 1 else -5
 
+def drawWinner(aText):
+    draw_text = SCORE_FONT.render(aText, 1, WHITE)
+    WINDOW.blit(draw_text, (SCREEN_WIDTH // 2 - draw_text.get_width()//2, SCREEN_HEIGHT // 2 - draw_text.get_height()//2))
+    pygame.display.update()
+    pygame.time.delay(5000)
+
 # Actual Game
 
 def main():
@@ -63,6 +69,7 @@ def main():
       if event.type == pygame.QUIT:
         run = False
         pygame.quit()
+        exit()
   
     # Input Handling
     keys = pygame.key.get_pressed()
@@ -94,7 +101,7 @@ def main():
     elif BALL.x <= 0:
       P1Score += 1
       resetBall(BALL, BALL_VELOCITY)
-    elif (P1.x <= BALL.x <= P1.x + PLAYER_WIDTH and P1.y <= BALL.y <= P1.y + PLAYER_HEIGHT) or (P2.x <= BALL.x + BALL_SIZE <= P2.x + PLAYER_WIDTH and P2.y <= BALL.y <= P2.y + PLAYER_HEIGHT):
+    elif BALL.colliderect(P1) or BALL.colliderect(P2):
       BALL_VELOCITY['x'] *= -1.05
     
     # Game Display
@@ -111,6 +118,13 @@ def main():
     WINDOW.blit(P2ScoreText, (SCREEN_WIDTH / 2 - CENTER_LINE_WIDTH / 2 - SCORE_FONT.get_linesize() / 2 - P2ScoreText.get_width(), SCORE_FONT.get_linesize() / 2))
     
     pygame.display.update()
+    
+    if P1Score >= 10:
+      drawWinner('Player 1 wins!')
+      break
+    elif P2Score >= 10:
+      drawWinner('Player 2 wins!')
+      break
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+  main()
